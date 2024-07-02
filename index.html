@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RLB bsn.cloud player Remote UDP Control</title>
+</head>
+<body>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        .sendUDP, 
+        .auth {
+            margin: 5px;
+            color: rgba(0,0,0,1);
+            height:20px;
+            width:100px; 
+        }
+
+        .status {
+            margin-top: 5px;
+            font-size: 12px;
+            border: 2px solid black;
+            height: 20vh;
+            width: 400px;
+        }
+
+        .request-status {
+            margin-top: 15px;
+            font-size: 15px;
+        }
+
+        #network, 
+        #Username, 
+        #deviceSerial,
+        #sendCustomUDP{
+            margin-bottom: 5px;
+            height: 15px;
+            width:300px; 
+        }
+
+        #Password,
+        #client_id,
+        #client_secret{
+            margin-bottom: 0px;
+            height: 15px;
+            width:300px;
+            margin-top: 0px;
+            
+        }
+
+        label {
+            font-size: 10px;
+        }
+
+        .button-container-sendUDP{
+            margin-top: 5px;
+        }
+
+      
+        label[for="Password"],
+        label[for="client_id"],
+        label[for="client_secret"],
+        #togglePassword,
+        #toggleclient_id,
+        #toggleclient_secret {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        label[for="togglePassword"],
+        label[for="toggleclient_id"],
+        label[for="toggleclient_secret"]{
+            font-style: italic;
+        }
+
+        label[for="network"],
+        label[for="username"],
+        label[for="password"],
+        label[for="client_id"],
+        label[for="client_secret"],
+        label[for="deviceSerial"],
+        label[for="sendCustomUDP"],
+        label[for="play1"]{
+            font-weight: bold;
+        }
+
+        .password-toggle-container {
+            display: flex;
+            align-items: center; /* Align items vertically in the center */
+        }
+
+    </style>
+
+    <div class="title">RLB bsn.cloud player Remote UDP Control</div>
+    
+    <label for="network">Network:</label>
+    <input type="text" id="network">
+
+    <label for="username">Username:</label>
+    <input type="text" id="Username">
+
+    <label for="password">Password:</label>
+    <input type="password" id="Password">
+    <div class="password-toggle-container">
+        <label for="togglePassword">Show Password:</label>
+        <input type="checkbox" id="togglePassword">
+    </div>
+
+    <label for="client_id">client_id:</label>
+    <input type="password" id="client_id">
+    <div class="client_id-toggle-container">
+        <label for="toggleclient_id">Show client_id:</label>
+        <input type="checkbox" id="toggleclient_id">
+    </div>
+
+    <label for="client_secret">client_secret:</label>
+    <input type="password" id="client_secret">
+    <div class="client_secret-toggle-container">
+        <label for="toggleclient_secret">Show client_secret:</label>
+        <input type="checkbox" id="toggleclient_secret">
+    </div>
+
+    <label for="deviceSerial">Device Serial#:</label>
+    <input type="text" id="deviceSerial">
+
+    <div class="button-container">
+        <button class="auth">Authenticate</button>
+        <label for="play1">Pre-programmed UDP buttons below:</label>
+        <button class="sendUDP">play1</button>
+        <button class="sendUDP">play2</button>
+        <button class="sendUDP">play3</button>
+    </div>
+
+    <label for="sendCustomUDP">Enter Custom UDP Command below:</label>
+    <input type="text" id="sendCustomUDP">
+
+    <div class="button-container-sendUDP">
+        <button class="sendCustomUDP_btn">Send Custom UDP</button>
+    </div>
+
+    <!-- add a status field under the button-container -->
+    <div class="request-status">Request Status: </div>
+    <div class="status"></div>
+</body>
+<script>
+    var token = '';
+    var deviceSerial = '';
+    var authformPayload = '';
+    var networkEncoded = '';
+    var usernameEncoded = '';
+    var passwordEncoded = '';
+    var client_idEncoded = '';
+    var client_secretEncoded = '';
+
+    document.querySelector('.auth').addEventListener('click', sendRestApiCallAuth);
+ 
+    document.querySelectorAll('.sendUDP').forEach(item => {
+        item.addEventListener('click', event => {
+            sendRestApiCallSendUDP(item.textContent);
+        });
+    });
+
+    document.querySelector('.sendCustomUDP_btn').addEventListener('click', function() {
+    var CustomUDPcmd = document.getElementById('sendCustomUDP').value;
+    sendRestApiCallSendUDP(CustomUDPcmd);
+    });
+
+    // JavaScript to toggle the password visibility
+    document.getElementById('togglePassword').addEventListener('change', function(e) {
+        const passwordInput = document.getElementById('Password');
+        if (e.target.checked) {
+            passwordInput.type = 'text';
+        } else {
+            passwordInput.type = 'password';
+        }
+    });
+
+    document.getElementById('toggleclient_secret').addEventListener('change', function(e) {
+        const passwordInput = document.getElementById('client_secret');
+        if (e.target.checked) {
+            passwordInput.type = 'text';
+        } else {
+            passwordInput.type = 'password';
+        }
+    });
+
+    document.getElementById('toggleclient_id').addEventListener('change', function(e) {
+        const passwordInput = document.getElementById('client_id');
+        if (e.target.checked) {
+            passwordInput.type = 'text';
+        } else {
+            passwordInput.type = 'password';
+        }
+    });
+
+    function sendRestApiCallAuth() {
+
+        //read the network, username and password from the input fields
+        let network = document.getElementById('network').value;
+        let username = document.getElementById('Username').value;
+        let password = document.getElementById('Password').value;
+        let client_id = document.getElementById('client_id').value;
+        let client_secret = document.getElementById('client_secret').value;
+        deviceSerial = document.getElementById('deviceSerial').value;
+
+        console.log('network: ' + network);
+        console.log('username: ' + username);
+        console.log('client_id: ' + client_id);
+        console.log('client_secret: ' + client_secret);
+        //console.log('password: ' + password);
+        console.log('deviceSerial: ' + deviceSerial);
+
+        //URL encode network, username, password, client_id and client_secret
+        networkEncoded = encodeURIComponent(network + '/');
+        usernameEncoded = encodeURIComponent(username);
+        passwordEncoded = encodeURIComponent(password);
+        client_idEncoded = encodeURIComponent(client_id);
+        client_secretEncoded = encodeURIComponent(client_secret);
+
+        console.log('networkEncoded: ' + networkEncoded);
+        console.log('usernameEncoded: ' + usernameEncoded);
+        //console.log('passwordEncoded: ' + passwordEncoded);
+
+        authformPayload = "username=" + networkEncoded + usernameEncoded + "&password=" + passwordEncoded + "&client_id=" + client_idEncoded + "&grant_type=password&client_secret=" + client_secretEncoded;
+        //console.log('authformPayload: ' + authformPayload);
+
+        // Send REST API call to authenticate and get token
+        fetch('https://api.bsn.cloud/2019/03/REST/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: authformPayload
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the response data
+            console.log(data);
+            console.log(data.access_token);
+            token = data.access_token;
+            // Update status field with token
+            document.querySelector('.status').textContent = 'data: ' + JSON.stringify(data); 
+            document.querySelector('.status').style.overflow = 'auto';
+            document.querySelector('.status').style.whiteSpace = 'pre-wrap';
+        })
+        .catch(error => {
+            // Handle any errors
+            console.error(error);
+            // Update status field with error
+            document.querySelector('.status').textContent = 'error: ' + JSON.stringify(error); 
+            document.querySelector('.status').style.overflow = 'auto';
+            document.querySelector('.status').style.whiteSpace = 'pre-wrap';
+        });
+    }
+
+    function sendRestApiCallSendUDP(UDPcmd) {
+
+        deviceSerial = document.getElementById('deviceSerial').value;
+        console.log('token: ' + token);
+        console.log('UDPcmd: ' + UDPcmd);
+        console.log('deviceSerial: ' + deviceSerial);
+
+        //CustomUDPcmd = document.getElementById('sendCustomUDP').value
+
+        // Send REST API call using token
+        fetch('https://ws.bsn.cloud/rest/v1/custom/?destinationType=player&destinationName=' + deviceSerial, {
+            method: 'PUT',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Accept': 'application/json, application/vnd.bsn.error+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "data": {
+                    "command": UDPcmd,
+                    "returnImmediately": true
+                }
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the response data
+            console.log(data);
+            // Update status field with data
+            document.querySelector('.status').textContent = 'data: ' + JSON.stringify(data) + '\n' + 'UDP Command: ' + UDPcmd + '\n' + 'sent to: ' + deviceSerial; 
+            document.querySelector('.status').style.overflow = 'auto';
+            document.querySelector('.status').style.whiteSpace = 'pre-wrap';
+        })
+        .catch(error => {
+            // Handle any errors
+            console.error(error);
+            // Update status field with error
+            document.querySelector('.status').textContent = 'error: ' + JSON.stringify(error); 
+            document.querySelector('.status').style.overflow = 'auto';
+            document.querySelector('.status').style.whiteSpace = 'pre-wrap';
+        });
+
+    }
+</script>
+</html>
