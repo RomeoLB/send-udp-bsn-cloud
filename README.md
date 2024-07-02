@@ -1,6 +1,6 @@
 # bsn.cloud Player Remote UDP Control
 
-This simple HTML app to run from a desktop/laptop system which can be used to communicate with a remote Brightsign player via bsn.cloud using REST API to send a UDP message. 
+This is a simple HTML app to run from a desktop/laptop system which can be used to communicate with a remote Brightsign player via bsn.cloud using REST API to send a UDP message. 
 
 Download the index.html file on your desktop/laptop and launch it with the Chrome web browser.
 
