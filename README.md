@@ -15,7 +15,7 @@ Then click on the "Authenticate" button to obtain a token to allow communication
 
 <img width="563" alt="image" src="https://github.com/RomeoLB/send-udp-bsn-cloud/assets/136584791/f0f45cc0-f084-42b9-b31c-c7269877dcc7">
 
-After authenticating with the bsn.cloud control server, you can click on one of the Pre-programmed UDP button to send a UDP message (play1, play2 or play3) or enter a UDP command in the "Enter Custom UDP Command below" then click on the "Send Custom UDP" button to send a UDP message to your target player (specified in Device Serial# field)
+After authenticating with the bsn.cloud control server, you can click on one of the Pre-programmed UDP button to send a UDP message (play1, play2 or play3) or enter a UDP command in the "Enter Custom UDP Command below" field then click on the "Send Custom UDP" button to send a UDP message to the target player (specified in Device Serial# field)
 
 <img width="536" alt="image" src="https://github.com/RomeoLB/send-udp-bsn-cloud/assets/136584791/85814146-a15b-4155-8a04-54e912fdca44">
 
