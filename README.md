@@ -1,6 +1,8 @@
 # bsn.cloud Player Remote UDP Control
 
-This simple HTML app can be used to communicate with a remote Brightsign player via bsn.cloud using REST API to send a UDP message. 
+This simple HTML app to run from a desktop/laptop system which can be used to communicate with a remote Brightsign player via bsn.cloud using REST API to send a UDP message. 
+
+Download the index.html file on your desktop/laptop and launch it with the Chrome web browser.
 
 Make sure to enter in the relevant fields:
 
@@ -18,5 +20,3 @@ Then click on the "Authenticate" button to obtain a token to allow communication
 After authenticating with the bsn.cloud control server, you can click on one of the Pre-programmed UDP button to send a UDP message (play1, play2 or play3) or enter a UDP command in the "Enter Custom UDP Command below" field then click on the "Send Custom UDP" button to send a UDP message to the target player (specified in Device Serial# field)
 
 <img width="536" alt="image" src="https://github.com/RomeoLB/send-udp-bsn-cloud/assets/136584791/85814146-a15b-4155-8a04-54e912fdca44">
-
-
