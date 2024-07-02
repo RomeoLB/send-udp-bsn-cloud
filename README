@@ -1,1 +1,3 @@
+# bsn.cloud Player Remote UDP Control
 
+This simple HTML app can be used to communicate with a Brightsign player via bsn.cloud using REST API to send a UDP message. 
